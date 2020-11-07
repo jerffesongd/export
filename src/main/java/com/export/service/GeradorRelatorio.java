@@ -38,17 +38,30 @@ public class GeradorRelatorio {
 		
 		Class<?> clazz = dados.get(0).getClass();
 		
+		Relatorio cabecalho = dados.get(0);
+		row = sheet.createRow(linha);
+		for (Method method : clazz.getDeclaredMethods()) {
+			if(method.isAnnotationPresent(CampoRelatorio.class)) {
+				if (method.invoke(cabecalho) != null) {
+					row.createCell(coluna).setCellValue(method.getName().replaceAll("get", "").toUpperCase() );
+				}
+				coluna++;
+			}
+		}
+		
+		linha++;
+		coluna = 0;
+		
 		for (Relatorio d : dados) {
 			row = sheet.createRow(linha);
-			
 			for (Method method : clazz.getDeclaredMethods()) {
 				if(method.isAnnotationPresent(CampoRelatorio.class)) {
 					if (method.invoke(d) != null) {
 						row.createCell(coluna).setCellValue(method.invoke(d).toString() );
 					}
-					
+					coluna++;
 				}
-				coluna++;
+				
 			}
 			linha++;
 			coluna =0;
